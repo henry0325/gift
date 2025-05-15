@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Gift from Alan</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 50%, #c5cae9 100%);
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 0px 0;
+    }
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding-bottom: 20px;
+    }
+    h1 {
+      font-weight: bold;
+      font-size: 34px;
+      margin-bottom: 10px;
+    }
+    .gift-container {
+      position: relative;
+      width: 80vw;
+      max-width: 400px;
+      margin: 0 auto;
+      perspective: 1000px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    .gift-top {
+      width: 100%;
+      position: absolute;
+      top: -35px;
+      left: 0;
+      transform-origin: left center;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+      z-index: 2;
+    }
+    .gift-bottom {
+      width: 100%;
+      top: 35px;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+    }
+    .gift-container:hover .gift-top {
+      transform: rotateX(25deg) rotateZ(-10deg);
+    }
+    /* 點擊後上蓋向上飛並旋轉 */
+    .gift-top.lift-open {
+      transform: translateY(-160px) rotate(-25deg) !important;
+      opacity: 0;
+    }
+    /* 點擊後下蓋往下沉並淡出 */
+    .gift-bottom.lift-bottom {
+      transform: translateY(80px);
+      opacity: 0;
+    }
+    #message, #pdf-viewer, #pdf-fallback {
+      display: none;
+      margin-top: 0px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+    #message.show,
+    #pdf-viewer.show,
+    #pdf-fallback.show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #message {
+      font-size: 28px;
+    }
+    iframe {
+      width: 100%;
+      height: 75vh;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #pdf-fallback {
+      margin: 20px auto;
+      max-width: 80%;
+    }
+    #pdf-fallback a {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 18px;
+      margin-top: 15px;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      20% { transform: scale(1.05); }
+      40% { transform: scale(1); }
+      60% { transform: scale(1.05); }
+      80% { transform: scale(1); }
+      100% { transform: scale(1); }
+    }
+    
+    .gift-animate {
+      animation: pulse 2s ease-in-out infinite;
+      animation-delay: 1s;
+    }
+    
+    .open-button {
+      background: linear-gradient(145deg, #63BE7B, #FFEF9C);
+      color: black;
+      border: none;
+      padding: 12px 30px;
+      font-size: 34px;
+      font-weight: bold;
+      border-radius: 50px;
+      box-shadow: 0 5px 15px rgba(255, 94, 98, 0.4);
+      cursor: pointer;
+      transform: translateY(0);
+      transition: all 0.3s ease;
+      position: absolute;
+      overflow: hidden;
+      z-index: 3;
+      letter-spacing: 2px;
+      bottom: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    
+    .open-button:hover {
+      transform: translateX(-50%) translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 94, 98, 0.6);
+    }
+    
+    .open-button:active {
+      transform: translateX(-50%) translateY(1px);
+      box-shadow: 0 2px 10px rgba(255, 94, 98, 0.4);
+    }
+    
+    .open-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: translateX(-100%);
+    }
+    
+    .open-button:hover::before {
+      animation: shine 1.5s infinite;
+    }
+    
+    @keyframes shine {
+      100% {
+        transform: translateX(100%);
+      }
+    }
+      @media(min-width: 768px) {
+      iframe {
+        height: 80vh;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+  <h1 class="header">🎁 A Gift from Alan 🎁</h1>
+  <div class="main-content">
+    <div class="gift-container gift-animate" id="gift-box" tabindex="0" role="button" aria-label="Open the gift">
+      <img class="gift-top" src="images/box-top.png" alt="boxtop" id="giftTop">
+      <img class="gift-bottom" src="images/box-bottom.png" alt="boxbottom" id="giftBottom">
+      <button class="open-button" id="openButton">OPEN</button>
+    </div>
+    <div id="message">A Concerto of Two Grandfathers</div>
+    <iframe id="pdf-viewer"
+      src="https://drive.google.com/file/d/1cJY_VDMF0JmhvzM-bC-bmnU1cfc41FVY/preview"
+      allow="autoplay"
+      allowfullscreen
+      frameborder="0"
+      title="PDF">
+    </iframe>
+    <div id="pdf-fallback">
+      <p>V V V If you cannot review, please click download V V V</p>
+      <a href="https://drive.google.com/file/d/1cJY_VDMF0JmhvzM-bC-bmnU1cfc41FVY/view" target="_blank">
+        A Concerto of Two Grandfathers
+      </a>
+    </div>
+  </div>
+  <audio id="celebration-sound" src="images/celebration.mp3" preload="auto"></audio>
+  <script>
+    const giftBox = document.getElementById('gift-box');
+    const giftTop = document.getElementById('giftTop');
+    const giftBottom = document.getElementById('giftBottom');
+    const openButton = document.getElementById('openButton');
+    const message = document.getElementById('message');
+    const pdfViewer = document.getElementById('pdf-viewer');
+    const pdfFallback = document.getElementById('pdf-fallback');
+    const sound = document.getElementById('celebration-sound');
+    
+    // 點擊或按鍵操作打開禮物盒
+    function openGift() {
+      // 停止禮物盒的脈動動畫
+      giftBox.classList.remove('gift-animate');
+      
+      giftTop.classList.add('lift-open');
+      giftBottom.classList.add('lift-bottom');
+      openButton.style.display = 'none'; // 隱藏按鈕
+      
+      setTimeout(() => {
+        giftBox.style.display = 'none';
+        message.classList.add('show');
+        pdfViewer.classList.add('show');
+        pdfFallback.classList.add('show');
+        try {
+          sound.play().catch(err => console.log('audio error:', err));
+          confetti({
+            particleCount: 150,
+            spread: 120,
+            origin: { y: 0.6 }
+          });
+        } catch (error) {
+          console.log('sound effect error:', error);
+        }
+      }, 500);
+    }
+    
+    // 為按鈕和禮物盒添加點擊事件
+    openButton.addEventListener('click', function(event) {
+      event.stopPropagation(); // 防止事件冒泡到禮物盒
+      openGift();
+    });
+    
+    giftBox.addEventListener('click', openGift);
+    
+    // 增加鍵盤無障礙支持
+    giftBox.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openGift();
+      }
+    });
+    
+    // 檢測 PDF 加載狀態
+    function checkPdfViewer() {
+      try {
+        // 嘗試檢測 iframe 內容是否加載成功
+        const iframeDoc = pdfViewer.contentDocument || pdfViewer.contentWindow.document;
+        // 如果無法訪問 iframe 內容（跨域問題），則顯示備用連結
+        if (!iframeDoc) {
+          pdfFallback.style.display = 'block';
+        }
+      } catch (e) {
+        // 如果有錯誤（通常是跨域錯誤），顯示備用連結
+        pdfFallback.style.display = 'block';
+      }
+    }
+    
+    // PDF iframe 加載完成後檢測
+    pdfViewer.addEventListener('load', checkPdfViewer);
+  </script>
+</body>
+</html>
